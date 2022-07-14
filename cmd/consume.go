@@ -16,8 +16,7 @@ import (
 // consumeCmd represents the consume command
 var consumeCmd = &cobra.Command{
 	Use:   "consume",
-	Short: "A brief description of your command",
-	Long:  `consume is for testing message consumers`,
+	Short: "Test JetStream consuming",
 	Run: func(cmd *cobra.Command, args []string) {
 		// Connect to NATS
 		nc, _ := nats.Connect("nats://foo:bar@127.0.0.1:4222")
@@ -27,7 +26,7 @@ var consumeCmd = &cobra.Command{
 
 		// Simple Async Ephemeral Consumer
 		_, err := js.Subscribe("TEST_STREAM.*", func(m *nats.Msg) {
-			fmt.Printf("Received a JetStream message: %s\n", string(m.Data))
+			fmt.Printf("Received a JetStream message: %s - %s\n", string(m.Data), m.Subject)
 			m.Ack()
 		})
 		if err != nil {

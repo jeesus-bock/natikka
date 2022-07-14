@@ -17,8 +17,7 @@ import (
 // publishCmd represents the publish command
 var publishCmd = &cobra.Command{
 	Use:   "publish",
-	Short: "A brief description of your command",
-	Long:  `publish is testing grounds for NATS message publishing`,
+	Short: "Test JetStream publishing",
 	Run:   publish,
 }
 
@@ -49,14 +48,14 @@ func publish(cmd *cobra.Command, args []string) {
 		log.Fatal(err)
 	}
 
-	// Simple Async Stream Publisher
+	// Simple Stream Publisher
 	go func() {
 		for {
 			// Sleep 1-5 seconds
 			d := time.Duration(rand.Intn(5)) * time.Second
 			time.Sleep(d)
 			// Create test message
-			msg := "Time " + time.Now().UTC().Format("15:04:05")
+			msg := "Time " + time.Now().Format("15:04:05")
 
 			// And publish it
 			js.Publish("TEST_STREAM.subj", []byte(msg))
