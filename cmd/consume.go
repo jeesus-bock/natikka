@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"natikka/structs"
 
 	"github.com/nats-io/nats.go"
 	"github.com/spf13/cobra"
@@ -19,20 +20,17 @@ var consumeCmd = &cobra.Command{
 	Short: "Test JetStream consuming",
 	Run: func(cmd *cobra.Command, args []string) {
 		// Connect to NATS
-		nc, _ := nats.Connect("nats://foo:bar@127.0.0.1:4222")
-
-		// Create JetStream Context
-		js, _ := nc.JetStream(nats.PublishAsyncMaxPending(256))
-
-		// Simple Async Ephemeral Consumer
-		_, err := js.Subscribe("TEST_STREAM.*", func(m *nats.Msg) {
-			fmt.Printf("Received a JetStream message: %s - %s\n", string(m.Data), m.Subject)
-			m.Ack()
-		})
+		nc, err := nats.Connect("nats://foo:bar@127.0.0.1:4222")
 		if err != nil {
 			log.Fatal(err)
 		}
-
+		enc, err := nats.NewEncodedConn(nc, nats.JSON_ENCODER)
+		if err != nil {
+			log.Fatal(err)
+		}
+		enc.Subscribe("subj", func(d *structs.Data) {
+			fmt.Printf("Received a data: %+v\n", d)
+		})
 		// Keep running indefinitely
 		ctx := context.Background()
 		<-ctx.Done()

@@ -10,6 +10,8 @@ import (
 	"math/rand"
 	"time"
 
+	"natikka/structs"
+
 	"github.com/nats-io/nats.go"
 	"github.com/spf13/cobra"
 )
@@ -28,7 +30,13 @@ func init() {
 func publish(cmd *cobra.Command, args []string) {
 	// Connect to NATS
 	nc, err := nats.Connect("nats://foo:bar@127.0.0.1:4222")
-
+	if err != nil {
+		log.Fatal(err)
+	}
+	enc, err := nats.NewEncodedConn(nc, nats.JSON_ENCODER)
+	if err != nil {
+		log.Fatal(err)
+	}
 	///nc, err := nats.Connect(nats.DefaultURL,)
 
 	if err != nil {
@@ -36,30 +44,18 @@ func publish(cmd *cobra.Command, args []string) {
 	}
 	log.Println("Connected to NATS")
 
-	// Create JetStream Context
-	js, _ := nc.JetStream(nats.PublishAsyncMaxPending(256))
-
-	// Add the TEST_STREAM if it doesn't exist
-	_, err = js.AddStream(&nats.StreamConfig{
-		Name:     "TEST_STREAM",
-		Subjects: []string{"TEST_STREAM.*"},
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Simple Stream Publisher
+	// Simple Encoded Publisher
 	go func() {
 		for {
 			// Sleep 1-5 seconds
 			d := time.Duration(rand.Intn(5)) * time.Second
 			time.Sleep(d)
 			// Create test message
-			msg := "Time " + time.Now().Format("15:04:05")
+			msg := structs.Data{Time: time.Now(), Msg: "Foo Bar Baz"}
 
 			// And publish it
-			js.Publish("TEST_STREAM.subj", []byte(msg))
-			log.Println("Published: " + msg)
+			enc.Publish("subj", msg)
+			log.Printf("Published: %+v\n", msg)
 		}
 	}()
 
