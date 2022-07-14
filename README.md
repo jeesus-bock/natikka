@@ -14,4 +14,4 @@ See https://github.com/nats-io/natscli
 2) `sudo dpkg --install nats-0.0.33-386.deb`
 
 ### Run
-`nats-server`
+`nats-server -DV -m 8222 -user foo -pass bar`

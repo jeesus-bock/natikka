@@ -5,8 +5,11 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"context"
 	"fmt"
+	"log"
 
+	"github.com/nats-io/nats.go"
 	"github.com/spf13/cobra"
 )
 
@@ -16,7 +19,24 @@ var consumeCmd = &cobra.Command{
 	Short: "A brief description of your command",
 	Long:  `consume is for testing message consumers`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("consume called")
+		// Connect to NATS
+		nc, _ := nats.Connect("nats://foo:bar@127.0.0.1:4222")
+
+		// Create JetStream Context
+		js, _ := nc.JetStream(nats.PublishAsyncMaxPending(256))
+
+		// Simple Async Ephemeral Consumer
+		_, err := js.Subscribe("TEST_STREAM.*", func(m *nats.Msg) {
+			fmt.Printf("Received a JetStream message: %s\n", string(m.Data))
+			m.Ack()
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// Keep running indefinitely
+		ctx := context.Background()
+		<-ctx.Done()
 	},
 }
 

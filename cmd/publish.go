@@ -6,7 +6,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"math/rand"
 	"time"
@@ -29,8 +28,9 @@ func init() {
 
 func publish(cmd *cobra.Command, args []string) {
 	// Connect to NATS
-	//nc, err := nats.Connect("nats://test:test@0.0.0.0:4222")
-	nc, err := nats.Connect(nats.DefaultURL)
+	nc, err := nats.Connect("nats://foo:bar@127.0.0.1:4222")
+
+	///nc, err := nats.Connect(nats.DefaultURL,)
 
 	if err != nil {
 		log.Fatal(err)
@@ -55,18 +55,12 @@ func publish(cmd *cobra.Command, args []string) {
 			// Sleep 1-5 seconds
 			d := time.Duration(rand.Intn(5)) * time.Second
 			time.Sleep(d)
-			// Create test message.
+			// Create test message
 			msg := "Time " + time.Now().UTC().Format("15:04:05")
 
-			// And publish it.
-			js.PublishAsync("TEST_STREAM.subj", []byte(msg))
-
-			select {
-			case <-js.PublishAsyncComplete():
-				fmt.Println("Slept:", d.Seconds(), "Published: ", msg)
-			case <-time.After(5 * time.Second):
-				fmt.Println("Did not resolve in time")
-			}
+			// And publish it
+			js.Publish("TEST_STREAM.subj", []byte(msg))
+			log.Println("Published: " + msg)
 		}
 	}()
 
