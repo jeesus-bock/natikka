@@ -13,5 +13,9 @@ See https://github.com/nats-io/natscli
 1) `wget https://github.com/nats-io/natscli/releases/download/v0.0.33/nats-0.0.33-386.deb`
 2) `sudo dpkg --install nats-0.0.33-386.deb`
 
-### Run
+### Run the server
+Opens the monitoring at 127.0.0.1:8222
 `nats-server -DV -m 8222 -user foo -pass bar`
+
+### Run natikka
+`natikka publish` and `natikka consume`, tmux recommended :)
