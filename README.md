@@ -1,5 +1,9 @@
 # NATS experimentations
 
+
+## What's this about?
+[NATS.io](https://nats.io/) – Cloud Native, Open Source, High-performance Messaging is a messaging and persistence system I've heard a lot good things about. This is a repo with some basic client functionality implemented in Go.
+
 ## NATS server
 
 ### Install the server to localhost
